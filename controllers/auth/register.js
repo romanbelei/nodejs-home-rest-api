@@ -1,48 +1,32 @@
-const { Conflict } = require("http-errors");
-// const bcrypt = require("bcryptjs");
-
 const { User } = require("../../models");
+const bcrypt = require("bcryptjs");
+const gravatar = require("gravatar");
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
-    throw new Conflict(`User with ${email} already exist`);
+    return res.status(409).json({
+      status: "error",
+      code: 409,
+      data: "Conflict",
+      message: "Email is already use",
+    });
   }
-  const newUser = new User({ name, email });
-  /*
-    newUser = {
-        name, 
-        email,
-        setPassword(password){
-            this.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
-        }
-    }
-    */
-  newUser.setPassword(password);
-  /*
-    newUser = {
-        name, 
-        email,
-        password,
-        setPassword(password){
-            this.passord = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
-        }
-    }
-    */
-  newUser.save();
-  // const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  // const result = await User.create({name, email, password: hashPassword});
+  const hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+  const avatarURL = gravatar.url(email);
+  const newUser = await User.create({
+    email,
+    password: hashpassword,
+    avatarURL,
+    subscription: "starter",
+  });
+
   res.status(201).json({
-    status: "success",
-    code: 201,
-    data: {
-      user: {
-        email,
-        name,
-      },
+    status: "Created",
+    ResponseBody: {
+      user: newUser,
     },
   });
 };
-
 module.exports = register;

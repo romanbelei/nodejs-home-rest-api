@@ -19,4 +19,12 @@ router.post("/login", validation(joiLoginSchema), ctrlWrapper(ctrl.login));
 router.get("/logout", auth, ctrlWrapper(ctrl.logout));
 //router.get("signout")
 
+// router.patch(
+//   "/avatars",
+//   auth,
+//   upload.single("avatar"),
+//   ctrlWrapper(ctrl.setAvatar)
+// );
+// //router.patch("avatar")
+
 module.exports = router;
